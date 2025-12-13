@@ -30,6 +30,13 @@ RUN bash -c "source /root/.nvm/nvm.sh && npm install && node index.ts build-serv
 
 FROM base
 
+ENV RCON_CLI_VERSION=1.7.3
+
+RUN curl -sLO https://github.com/itzg/rcon-cli/releases/download/$RCON_CLI_VERSION/rcon-cli_$RCON_CLI_VERSION\_linux_amd64.tar.gz && \
+    tar xf rcon-cli_$RCON_CLI_VERSION\_linux_amd64.tar.gz rcon-cli && \
+    mv rcon-cli /bin/rcon-cli && \
+    rm rcon-cli_$RCON_CLI_VERSION\_linux_amd64.tar.gz
+
 ENV MINECRAFT_VERSION=1.20.1
 
 ENV FORGE_VERSION=47.4.0
