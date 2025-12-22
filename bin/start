@@ -14,8 +14,9 @@ if [ ! -d world ] && find $HOME/backups -name '*.tar.gz'; then
   fi
 fi
 
-if [ ! -f config/pcf-common.toml ] ; then
-  echo "[modernForwarding]\nforwardingSecret = \"$(cat /home/minecraft/secrets/forwarding.secret)\"" > config/pcf-common.toml
+PCF_FILE=config/proxy-compatible-forge.toml
+if [ ! -f $PCF_FILE ] ; then
+  echo "[modernForwarding]\nforwardingSecret = \"$(cat /home/minecraft/secrets/forwarding.secret)\"" > $PCF_FILE
 fi
 
 if [ ! -f eula.txt ]; then
