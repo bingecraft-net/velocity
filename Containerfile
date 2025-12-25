@@ -1,68 +1,26 @@
-FROM ubuntu:noble AS base
+FROM ubuntu:noble
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y curl git openjdk-21-jdk zsh && \
+    apt-get install -y curl openjdk-21-jdk zsh && \
     apt-get clean
-
-FROM base AS build
-
-ARG COMMIT
-
-ARG NODE_VERSION=23.6.0
-
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y build-essential zip && \
-    apt-get clean
-
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-
-RUN git clone https://github.com/ThePansmith/Monifactory /git
-
-WORKDIR /git/build
-
-RUN git fetch --depth=1 origin $COMMIT
-
-RUN git checkout $COMMIT
-
-RUN bash -c "source /root/.nvm/nvm.sh && npm install && node index.ts build-server"
-
-FROM base
-
-ENV RCON_CLI_VERSION=1.7.3
-
-RUN curl -sLO https://github.com/itzg/rcon-cli/releases/download/$RCON_CLI_VERSION/rcon-cli_$RCON_CLI_VERSION\_linux_amd64.tar.gz && \
-    tar xf rcon-cli_$RCON_CLI_VERSION\_linux_amd64.tar.gz rcon-cli && \
-    mv rcon-cli /bin/rcon-cli && \
-    rm rcon-cli_$RCON_CLI_VERSION\_linux_amd64.tar.gz
-
-ENV MINECRAFT_VERSION=1.20.1
-
-ENV FORGE_VERSION=47.4.0
-
-RUN curl -sLo /opt/forge-installer.jar https://maven.minecraftforge.net/net/minecraftforge/forge/$MINECRAFT_VERSION-$FORGE_VERSION/forge-$MINECRAFT_VERSION-$FORGE_VERSION-installer.jar
 
 RUN useradd -m minecraft
 
 USER minecraft
 
-WORKDIR /home/minecraft
+WORKDIR /home/minecraft/server
 
-RUN java -jar /opt/forge-installer.jar --installServer server
+ARG VERSION_VELOCITY
 
-RUN sed -i 's/^java/exec java/' server/run.sh
+ARG VERSION_VELOCITY_BUILD
 
-COPY --from=build --chown=minecraft /git/dist/server server
+RUN curl -sfLo velocity.jar https://api.papermc.io/v2/projects/velocity/versions/$VERSION_VELOCITY/builds/$VERSION_VELOCITY_BUILD/downloads/velocity-$VERSION_VELOCITY-$VERSION_VELOCITY_BUILD.jar
 
-RUN curl -sfLo server/mods/pcf.jar https://cdn.modrinth.com/data/vDyrHl8l/versions/82bwNhmQ/proxy-compatible-forge-1.2.1.jar
+RUN mkdir plugins
 
-COPY --chown=minecraft overrides server
+RUN curl -sfLo plugins/ambassador.jar https://cdn.modrinth.com/data/cOj6YqJM/versions/YeQbhgna/Ambassador-Velocity-1.4.5-all.jar
 
-ENV PATH="$PATH:/home/minecraft/.local/bin"
+COPY --chown=minecraft overrides .
 
-COPY ./bin/ .local/bin/
-
-WORKDIR server
-
-CMD exec start ./run.sh
+CMD exec java -jar velocity.jar

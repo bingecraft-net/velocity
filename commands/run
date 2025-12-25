@@ -2,6 +2,8 @@
 
 mkdir -p backups
 
+source commands/tag
+
 podman run \
   --cidfile cidfile \
   --detach \
@@ -10,4 +12,4 @@ podman run \
   --tty \
   --volume $(readlink -f backups):/home/minecraft/backups:U \
   --volume $(readlink -f secrets):/home/minecraft/secrets \
-  $(cat version/tag)
+  $TAG
