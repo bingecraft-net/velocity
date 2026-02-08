@@ -78,6 +78,7 @@ enable-player-address-logging = true
 # Configure your servers here. Each key represents the server's name, and the value
 # represents the IP address of the server to connect to.
 antimatter = "host.containers.internal:25567"
+antimatter-expert = "host.containers.internal:25568"
 
 # In what order we should try servers when a player logs in or is kicked from a server.
 try = [
@@ -85,11 +86,11 @@ try = [
 
 [forced-hosts]
 # Configure your forced hosts here.
-"antimatter-v2.bingecraft.net" = [
-    "antimatter"
-]
 "antimatter.bingecraft.net" = [
     "antimatter"
+]
+"expert.antimatter.bingecraft.net" = [
+    "antimatter-expert"
 ]
 
 [advanced]
